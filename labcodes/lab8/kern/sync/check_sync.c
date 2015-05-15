@@ -121,9 +121,18 @@ void phi_test_condvar (i) {
 void phi_take_forks_condvar(int i) {
      down(&(mtp->mutex));
 //--------into routine in monitor--------------
-     // LAB7 EXERCISE1: YOUR CODE
+     //--------into routine in monitor--------------
+     // LAB7 EXERCISE1: 2014310585
      // I am hungry
+	 state_condvar[i] = HUNGRY;
+	 phi_test_condvar(i);
      // try to get fork
+	if (state_condvar[i] != EATING)
+    {			//should make a decision (using if or while) in here LAB7 EXERCISE1: 2014310585
+		//cprintf("phi_take_forks_condvar: %d didn't get fork and will wait\n",i);
+		cond_wait(&mtp->cv[i]);
+	}
+	//cprintf("phi_take_forks_condvar: %d picked up the fork\n",i)
 //--------leave routine in monitor--------------
       if(mtp->next_count>0)
          up(&(mtp->next));
@@ -135,9 +144,14 @@ void phi_put_forks_condvar(int i) {
      down(&(mtp->mutex));
 
 //--------into routine in monitor--------------
-     // LAB7 EXERCISE1: YOUR CODE
+     // LAB7 EXERCISE1: 2014310585
      // I ate over
      // test left and right neighbors
+	 state_condvar[i] = THINKING;
+	 //cprintf("phi_put_forks_condvar: %d put down the left fork\n",i);
+	 phi_test_condvar(LEFT);
+	 //cprintf("phi_put_forks_condvar: %d put down the right fork\n",i);
+	 phi_test_condvar(RIGHT);
 //--------leave routine in monitor--------------
      if(mtp->next_count>0)
         up(&(mtp->next));
